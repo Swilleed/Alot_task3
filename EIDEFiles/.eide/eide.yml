@@ -1,0 +1,88 @@
+version: "4.1"
+name: Project
+type: C51
+deviceName: STC89C58RD+
+packDir: null
+srcDirs: []
+virtualFolder:
+  name: <virtual_root>
+  files: []
+  folders:
+    - name: Source Group 1
+      files:
+        - path: ../main.c
+        - path: ../Delay.c
+        - path: ../Delay.h
+        - path: ../OLED.c
+        - path: ../OLED.h
+        - path: ../OLED_Font.h
+        - path: ../mcu_compat.h
+        - path: ../ADC.c
+        - path: ../ADC.h
+        - path: ../PWM.c
+        - path: ../PWM.h
+        - path: ../UART.c
+        - path: ../UART.h
+      folders: []
+dependenceList: []
+outDir: build
+miscInfo:
+  uid: 6a9c63e01dc74dd83540fa3ac9fe8dcb
+targets:
+  Target 1:
+    cppPreprocessAttrs:
+      defineList: []
+      incList:
+        - ../../../Keil5/C51/INC/STC
+        - ../../../Keil5/C51/INC
+      libList: []
+    excludeList: []
+    settings:
+      debugger: unknown
+    toolchain: Keil_C51
+    toolchainConfigMap:
+      GNU_SDCC_MCS51:
+        linkerScript: "null"
+        options:
+          version: 1
+          afterBuildTasks: []
+          asm-compiler: {}
+          beforeBuildTasks: []
+          c/cpp-compiler:
+            language-c: c99
+          global:
+            code-size: "8192"
+            iram-size: "128"
+            mem-model: small
+            optimize-type: speed
+            xram-size: "1024"
+          linker:
+            output-format: elf
+            remove-unused-input-sections: true
+      Keil_C51:
+        options:
+          version: 2
+          afterBuildTasks: []
+          asm-compiler: {}
+          beforeBuildTasks: []
+          c/cpp-compiler:
+            optimization-level: level-8
+            optimization-type: SPEED
+          global:
+            ram-mode: SMALL
+            rom-mode: LARGE
+          linker:
+            output-format: elf
+            remove-unused: true
+            use-RTX: None
+    uploadConfigMap:
+      Custom:
+        bin: ""
+        commandLine: ""
+        eraseChipCommand: ""
+      stcgal:
+        bin: ""
+        eepromImgPath: "null"
+        extraOptions: ""
+        options: .eide/stc.flash.json
+    uploader: stcgal

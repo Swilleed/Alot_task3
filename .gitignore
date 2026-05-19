@@ -1,0 +1,27 @@
+# Keil / EIDE generated files
+EIDEFiles/build/
+EIDEFiles/.eide/log
+EIDEFiles/.eide.usr.ctx.json
+EIDEFiles/Objects/
+EIDEFiles/Listings/
+
+# Build outputs
+build/
+Objects/
+Listings/
+*.hex
+*.map
+*.lnp
+*.obj
+*.lst
+*.m51
+*.i
+*.sbr
+*.mem
+*.sym
+
+# IDE caches
+.vscode/
+Project.uvgui.*
+CONTEXT.md
+
