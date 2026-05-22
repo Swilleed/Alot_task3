@@ -2,14 +2,26 @@
 #include "OLED.h"
 #include "UART.h"
 #include "ADC.h"
-#include "PWM.h"
+#include "Delay.h"
+
+/* XPT2046 命令：单端 12-bit */
+#define ADC_CH0  0x94
 
 void main()
 {
+    unsigned int adc_val;
+
     OLED_Init();
-    OLED_ShowString(0, 0, "System Ready");
+    UART_Init();
+    ADC_Init();
+    OLED_ShowString(0, 0, "ADC+UART OK");
 
     while (1) {
-        // TODO: 循环读取 ADC 数据，通过串口发送给上位机
+        adc_val = ADC_ReadValue(ADC_CH0);
+
+        UART_SendNumber(adc_val);
+        UART_SendString("\r\n");
+
+        Delay(10);  /* ~10ms 采样间隔 */
     }
 }

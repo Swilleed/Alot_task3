@@ -31,3 +31,15 @@ void UART_SendString(const char *str)
         UART_SendByte(*str++); // 发送字符串中的每个字符
     }
 }
+
+void UART_SendNumber(unsigned int num)
+{
+    char buf[6];
+    unsigned char i = 5;
+    buf[5] = '\0';
+    do {
+        buf[--i] = '0' + (num % 10);
+        num /= 10;
+    } while (num > 0);
+    UART_SendString(buf + i);
+}
