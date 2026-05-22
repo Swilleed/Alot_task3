@@ -32,7 +32,6 @@ void PWM_Init(void)
     TL0 = 156;
 
     ET0 = 1;  /* 允许 Timer 0 中断 */
-    EA  = 1;  /* 开总中断 */
     TR0 = 1;  /* 启动 Timer 0 */
 }
 
