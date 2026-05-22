@@ -1,35 +1,70 @@
 #include <STC89C5xRC.H>
+#include "UART.h"
+
+#define RX_BUF_SIZE  32
+
+static volatile unsigned char rx_buf[RX_BUF_SIZE];
+static volatile unsigned char rx_idx;
+static volatile unsigned char cmd_ready;
+
+/* 串口中断 ISR（中断号 4）*/
+static void UART_ISR(void) interrupt 4
+{
+    unsigned char c;
+
+    if (RI) {
+        RI = 0;
+        c = SBUF;
+
+        if (c == '\r' || c == '\n') {
+            if (rx_idx > 0) {
+                rx_buf[rx_idx] = '\0';
+                cmd_ready = 1;
+            }
+            rx_idx = 0;
+        } else if (rx_idx < RX_BUF_SIZE - 1) {
+            rx_buf[rx_idx++] = c;
+        }
+    }
+
+    if (TI)
+        TI = 0;
+}
 
 void UART_Init()
 {
-    SCON = 0x50;   // 设置串口工作模式1，允许接收
-    TMOD |= 0x20;  // 定时器1工作在模式2（自动重载）
+    SCON = 0x50;   // 模式1，允许接收
+    TMOD |= 0x20;  // 定时器1模式2（自动重载）
     PCON |= 0x80;  // SMOD = 1（波特率加倍）
-    TH1 = 0xFF;    // 设置波特率为57600 (11.0592MHz)
+    TH1 = 0xFF;    // 57600 baud @ 11.0592MHz
     TL1 = 0xFF;
     TR1 = 1;       // 启动定时器1
+    ES  = 1;       // 使能串口中断
+}
+
+unsigned char UART_CommandReady(void)
+{
+    return cmd_ready;
+}
+
+unsigned char *UART_GetCommand(void)
+{
+    cmd_ready = 0;
+    return (unsigned char *)rx_buf;
 }
 
 void UART_SendByte(unsigned char byte)
 {
-    SBUF = byte; // 将数据写入SBUF寄存器
+    SBUF = byte;
     while (!TI)
-        ;   // 等待发送完成
-    TI = 0; // 清除发送完成标志
-}
-
-unsigned char UART_ReceiveByte()
-{
-    while (!RI)
-        ;        // 等待接收完成
-    RI = 0;      // 清除接收完成标志
-    return SBUF; // 返回接收到的数据
+        ;
+    TI = 0;
 }
 
 void UART_SendString(const char *str)
 {
     while (*str) {
-        UART_SendByte(*str++); // 发送字符串中的每个字符
+        UART_SendByte(*str++);
     }
 }
 
