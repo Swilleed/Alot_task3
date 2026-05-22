@@ -5,10 +5,14 @@ static unsigned char pwm_counter = 0;
 static unsigned char pwm_duty_a = 0;
 static unsigned char pwm_duty_b = 0;
 
-/* Timer 0 ISR — 软件 PWM，100 步分辨率 */
-void timer0_isr(void) interrupt 1
+/* Timer 0 16-bit 重载值（mode 1 手动重载） */
+static unsigned int reload_val;
+
+/* Timer 0 ISR — mode 1，手动重载 */
+void timer0_isr(void) interrupt 1 using 1
 {
-    /* Timer 0 mode 2 自动重载，无需手动赋值 */
+    TL0 = (unsigned char)reload_val;
+    TH0 = (unsigned char)(reload_val >> 8);
 
     if (++pwm_counter >= 100) {
         pwm_counter = 0;
@@ -20,22 +24,23 @@ void timer0_isr(void) interrupt 1
 
 void PWM_Init(void)
 {
-    pwm_duty_a = 50;  /* 默认 50% 占空比 */
+    pwm_duty_a = 50;
     pwm_duty_b = 0;
 
-    P10 = 1;  /* duty > 0，初始拉高 */
+    P10 = 1;
     P11 = 0;
 
-    /* Timer 0, mode 2 (8-bit 自动重载) */
+    /* Timer 0 mode 1（16-bit 手动重载） */
     TMOD &= 0xF0;
-    TMOD |= 0x02;
+    TMOD |= 0x01;
 
-    /* 默认 40Hz：tick = 250µs → TH0 = 256 - 250 = 6 */
-    TH0 = 6;
-    TL0 = 6;
+    /* 默认 5Hz @ 11.0592MHz：tick = 9216/5 = 1843 → reload = 65536-1843 */
+    reload_val = 63693;
+    TL0 = (unsigned char)reload_val;
+    TH0 = (unsigned char)(reload_val >> 8);
 
-    ET0 = 1;  /* 允许 Timer 0 中断 */
-    TR0 = 1;  /* 启动 Timer 0 */
+    ET0 = 1;
+    TR0 = 1;
 }
 
 void PWM_SetDutyCycle(unsigned char duty)
@@ -52,14 +57,14 @@ void PWM_SetDutyCycleB(unsigned char duty)
 
 void PWM_SetFrequency(unsigned int freq_hz)
 {
-    unsigned char tick;
+    unsigned int tick;
 
-    if (freq_hz < 40)  freq_hz = 40;
+    if (freq_hz < 1)   freq_hz = 1;
     if (freq_hz > 300) freq_hz = 300;
 
-    /* tick_us = 10000 / freq_hz → 机器周期数 (12MHz 下 1µs = 1 周期) */
-    tick = 10000U / freq_hz;
+    tick = 9216U / freq_hz;
 
-    TH0 = 256 - tick;
-    TL0 = 256 - tick;
+    EA = 0;
+    reload_val = 65536U - tick;
+    EA = 1;
 }
