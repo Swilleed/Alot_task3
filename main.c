@@ -6,22 +6,27 @@
 #include "Delay.h"
 
 /* XPT2046 通道命令：单端 12-bit */
-#define ADC_XP   0x94
-#define ADC_YP   0xD4
+#define ADC_XP 0x94
+#define ADC_YP 0xD4
 #define ADC_AIN2 0xA4
 #define ADC_AIN3 0xE4
 
 /* 解析 "Value = xxx"，成功返回 1，值存入 val */
 static unsigned char parse_value_cmd(const unsigned char *str, unsigned int *val)
 {
-    while (*str == ' ') str++;
+    while (*str == ' ')
+        str++;
     if (str[0] != 'V' || str[1] != 'a' || str[2] != 'l' ||
-        str[3] != 'u' || str[4] != 'e') return 0;
+        str[3] != 'u' || str[4] != 'e')
+        return 0;
     str += 5;
-    while (*str == ' ') str++;
-    if (*str != '=') return 0;
+    while (*str == ' ')
+        str++;
+    if (*str != '=')
+        return 0;
     str++;
-    while (*str == ' ') str++;
+    while (*str == ' ')
+        str++;
 
     *val = 0;
     while (*str >= '0' && *str <= '9') {
@@ -70,5 +75,7 @@ void main()
         UART_SendByte(',');
         UART_SendNumber(ch3);
         UART_SendString("\r\n");
+
+        // Delay(1);
     }
 }

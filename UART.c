@@ -6,6 +6,7 @@
 static volatile unsigned char rx_buf[RX_BUF_SIZE];
 static volatile unsigned char rx_idx;
 static volatile unsigned char cmd_ready;
+static volatile unsigned char tx_done;
 
 /* 串口中断 ISR（中断号 4）*/
 static void UART_ISR(void) interrupt 4
@@ -27,8 +28,10 @@ static void UART_ISR(void) interrupt 4
         }
     }
 
-    if (TI)
+    if (TI) {
         TI = 0;
+        tx_done = 1;
+    }
 }
 
 void UART_Init()
@@ -55,10 +58,10 @@ unsigned char *UART_GetCommand(void)
 
 void UART_SendByte(unsigned char byte)
 {
+    tx_done = 0;
     SBUF = byte;
-    while (!TI)
+    while (!tx_done)
         ;
-    TI = 0;
 }
 
 void UART_SendString(const char *str)
