@@ -20,16 +20,19 @@ void timer0_isr(void) interrupt 1
 
 void PWM_Init(void)
 {
-    P10 = 0;
+    pwm_duty_a = 50;  /* 默认 50% 占空比 */
+    pwm_duty_b = 0;
+
+    P10 = 1;  /* duty > 0，初始拉高 */
     P11 = 0;
 
     /* Timer 0, mode 2 (8-bit 自动重载) */
     TMOD &= 0xF0;
     TMOD |= 0x02;
 
-    /* 默认 100Hz：tick = 100µs → TH0 = 256 - 100 = 156 */
-    TH0 = 156;
-    TL0 = 156;
+    /* 默认 40Hz：tick = 250µs → TH0 = 256 - 250 = 6 */
+    TH0 = 6;
+    TL0 = 6;
 
     ET0 = 1;  /* 允许 Timer 0 中断 */
     TR0 = 1;  /* 启动 Timer 0 */

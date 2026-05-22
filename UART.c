@@ -2,11 +2,12 @@
 
 void UART_Init()
 {
-    SCON = 0x50;  // 设置串口工作模式1，允许接收
-    TMOD |= 0x20; // 定时器1工作在模式2（自动重载）
-    TH1 = 0xFD;   // 设置波特率为9600
-    TL1 = 0xFD;   // 设置波特率为9600
-    TR1 = 1;      // 启动定时器1
+    SCON = 0x50;   // 设置串口工作模式1，允许接收
+    TMOD |= 0x20;  // 定时器1工作在模式2（自动重载）
+    PCON |= 0x80;  // SMOD = 1（波特率加倍）
+    TH1 = 0xFF;    // 设置波特率为57600 (11.0592MHz)
+    TL1 = 0xFF;
+    TR1 = 1;       // 启动定时器1
 }
 
 void UART_SendByte(unsigned char byte)
